@@ -382,7 +382,7 @@ export default function DashboardClient() {
                         Send tilbud
                       </Button>
                     )}
-                    {s === 2 && (
+                    {s === 2 || s=== 4 && (
                       <Button
                         variant="outline"
                         size="sm"
