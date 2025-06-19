@@ -1,7 +1,7 @@
 // src/app/page.tsx
 import Link from "next/link"
 import { getServerSession } from "next-auth/next"
-import { authOptions } from "./api/auth/[...nextauth]/route"
+import { authOptions } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
