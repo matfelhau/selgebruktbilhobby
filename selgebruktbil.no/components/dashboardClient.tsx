@@ -145,11 +145,11 @@ export default function DashboardClient() {
 
   // Status badges
   const statusLabels: Record<number, React.ReactNode> = {
-    1: <Badge variant="outline" className="bg-red-200">Ikke håndtert</Badge>,
+    1: <Badge variant="outline">Ikke håndtert</Badge>,
     2: <Badge variant="outline" className="bg-green-200">Tilbud sendt</Badge>,
     3: <Badge variant="outline">Fullført</Badge>,
-    4: <Badge variant="outline" className="bg-green-400">Akseptert</Badge>,
-    5: <Badge variant="outline" className="bg-red-400">Ikke interessert</Badge>,
+    4: <Badge variant="outline">Akseptert</Badge>,
+    5: <Badge variant="outline">Ikke interessert</Badge>,
   };
 
   // Filters
@@ -382,7 +382,7 @@ export default function DashboardClient() {
                         Send tilbud
                       </Button>
                     )}
-                    {s === 2 && (
+                    {s === 2 || s=== 4 && (
                       <Button
                         variant="outline"
                         size="sm"
