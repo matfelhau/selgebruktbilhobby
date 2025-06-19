@@ -314,31 +314,32 @@ export default function DashboardClient() {
               return (
                 <TableRow key={entry.id} className="hover:bg-gray-50">
                   <TableCell className="min-w-[200px]">
-                    <div className="space-y-1">
+                    <div className="">
                       <div>
                         <p className="font-medium text-sm">
                           {(v?.make || c.Merke || c.merke)?.toUpperCase()} {(v?.model || c.Model || c.model)?.toUpperCase()}
                         </p>
                       </div>
-                      <div className="flex items-center gap-2 text-s text-gray-600">
+                      <div className="flex items-center gap-2 text-xs text-gray-600">
                         <span>{c.Registreringsnummer || c.regnr}</span>
                         <span>•</span>
                         <span>{v?.color || 'Grå'}</span>
                         <span>•</span>
                         <span>{v?.fuel || 'Diesel'}</span>
                       </div>
-                      <div className="text-s text-gray-600">
+                      <div className="text-xs text-gray-600">
                         <span>{formatKilometers(c.Kilometerstand || v?.mileage)} km</span>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell className="min-w-[150px]">
                     <div>
-                      <p className="font-medium">
-                        {c.Navn}{c["Område (by)"] && ` - ${c["Område (by)"]}`}
+                      <p>
+                      <span className="font-medium">{c.Navn}</span>
+                      {c["Område (by)"] && <span className="ml-2 text-gray-500"> {c["Område (by)"]}</span>}
                       </p>
-                      <p className="text-sm text-gray-600">{c["E-post"]}</p>
-                      <p className="text-sm text-gray-600">{c.Telefon}</p>
+                      <p className="text-xs text-gray-600">{c["E-post"]}</p>
+                      <p className="text-xs text-gray-600">{c.Telefon}</p>
                     </div>
                   </TableCell>
                   <TableCell className="max-w-[300px]">
