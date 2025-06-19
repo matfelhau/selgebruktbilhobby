@@ -55,6 +55,20 @@ type Entry = {
   };
 };
 
+// Helper function to format kilometers with spaces
+const formatKilometers = (km: string | number | undefined): string => {
+  if (!km) return "";
+  
+  // Convert to string and remove any existing spaces or non-digits
+  const cleanKm = String(km).replace(/\D/g, "");
+  
+  // Convert to number and format with spaces
+  const number = parseInt(cleanKm, 10);
+  if (isNaN(number)) return "";
+  
+  return number.toLocaleString("no-NO").replace(/,/g, " ");
+};
+
 export default function DashboardClient() {
   const { data: session, status } = useSession();
   const [entries, setEntries] = useState<Entry[]>([]);
@@ -131,11 +145,11 @@ export default function DashboardClient() {
 
   // Status badges
   const statusLabels: Record<number, React.ReactNode> = {
-    1: <Badge variant="outline">Ikke håndtert</Badge>,
-    2: <Badge variant="outline">Tilbud sendt</Badge>,
+    1: <Badge variant="outline" className="bg-red-200">Ikke håndtert</Badge>,
+    2: <Badge variant="outline" className="bg-green-200">Tilbud sendt</Badge>,
     3: <Badge variant="outline">Fullført</Badge>,
-    4: <Badge variant="outline">Akseptert</Badge>,
-    5: <Badge variant="outline">Ikke interessert</Badge>,
+    4: <Badge variant="outline" className="bg-green-400">Akseptert</Badge>,
+    5: <Badge variant="outline" className="bg-red-400">Ikke interessert</Badge>,
   };
 
   // Filters
@@ -246,7 +260,7 @@ export default function DashboardClient() {
       <div className="flex flex-wrap items-center gap-4 mb-6">
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="cursor-pointer">
               {dateRange?.from && dateRange.to
                 ? `${format(dateRange.from, "dd.MM.yyyy")} – ${format(dateRange.to, "dd.MM.yyyy")}`
                 : "Velg dato"}
@@ -258,7 +272,7 @@ export default function DashboardClient() {
         </Popover>
 
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-40">
+          <SelectTrigger className="w-40 cursor-pointer">
             <SelectValue placeholder="Alle status" />
           </SelectTrigger>
           <SelectContent>
@@ -286,6 +300,7 @@ export default function DashboardClient() {
               <TableHead>Melding</TableHead>
               <TableHead>Sist oppdatert</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Tilbud</TableHead>
               <TableHead>Handling</TableHead>
             </TableRow>
           </TableHeader>
@@ -299,31 +314,29 @@ export default function DashboardClient() {
               return (
                 <TableRow key={entry.id} className="hover:bg-gray-50">
                   <TableCell className="min-w-[200px]">
-                    <div className="flex items-start gap-2">
+                    <div className="space-y-1">
                       <div>
-                        <p className="font-medium">
-                          {v?.make || c.Merke || c.merke} {v?.model || c.Model || c.model}
+                        <p className="font-medium text-sm">
+                          {(v?.make || c.Merke || c.merke)?.toUpperCase()} {(v?.model || c.Model || c.model)?.toUpperCase()}
                         </p>
-                        <p className="text-xs text-gray-500">
-                          {c.Registreringsnummer || c.regnr}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {c.Kilometerstand || v?.mileage} km
-                        </p>
-                        {v?.color && (
-                          <p className="text-xs text-gray-500">
-                            {v.color} • {v.fuel}
-                          </p>
-                        )}
+                      </div>
+                      <div className="flex items-center gap-2 text-s text-gray-600">
+                        <span>{c.Registreringsnummer || c.regnr}</span>
+                        <span>•</span>
+                        <span>{v?.color || 'Grå'}</span>
+                        <span>•</span>
+                        <span>{v?.fuel || 'Diesel'}</span>
+                      </div>
+                      <div className="text-s text-gray-600">
+                        <span>{formatKilometers(c.Kilometerstand || v?.mileage)} km</span>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell className="min-w-[150px]">
                     <div>
-                      <p className="font-medium">{c.Navn}</p>
-                      {c["Område (by)"] && (
-                        <p className="text-xs text-gray-500 mb-1">{c["Område (by)"]}</p>
-                      )}
+                      <p className="font-medium">
+                        {c.Navn}{c["Område (by)"] && ` - ${c["Område (by)"]}`}
+                      </p>
                       <p className="text-sm text-gray-600">{c["E-post"]}</p>
                       <p className="text-sm text-gray-600">{c.Telefon}</p>
                     </div>
@@ -359,35 +372,38 @@ export default function DashboardClient() {
                   </TableCell>
                   <TableCell>{statusLabels[s]}</TableCell>
                   <TableCell className="whitespace-nowrap">
+                    {(s === 1 || s === 5) && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => openOfferDialog(entry)}
+                        className="bg-blue-400 cursor-pointer hover:bg-blue-500"
+                      >
+                        Send tilbud
+                      </Button>
+                    )}
+                    {s === 2 && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => promptFinishOffer(entry)}
+                        className="cursor-pointer"
+                      >
+                        Marker som fullført
+                      </Button>
+                    )}
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap">
                     <Popover>
                       <PopoverTrigger asChild>
-                        <Button variant="ghost" size="icon">
+                        <Button variant="ghost" size="icon" className="cursor-pointer">
                           <MoreHorizontal />
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent align="end" className="space-y-1 p-2">
-                        {(s === 1 || s === 5) ? (
-                          <Button
-                            variant="ghost"
-                            className="w-full justify-start"
-                            onClick={() => openOfferDialog(entry)}
-                          >
-                            Send tilbud
-                          </Button>
-                        ) : (
-                          s !== 3 && (
-                            <Button
-                              variant="ghost"
-                              className="w-full justify-start"
-                              onClick={() => promptFinishOffer(entry)}
-                            >
-                              Fullfør
-                            </Button>
-                          )
-                        )}
                         <Button
                           variant="ghost"
-                          className="w-full justify-start text-red-600"
+                          className="w-full justify-start text-red-600 cursor-pointer"
                           onClick={() => requestDelete(entry)}
                         >
                           Slett

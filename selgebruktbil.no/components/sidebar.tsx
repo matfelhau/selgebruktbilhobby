@@ -12,8 +12,8 @@ export function Sidebar() {
   const pathname = usePathname()
 
   const items = [
-    { href: '/dashboard', label: 'Dashboard', icon: <PanelBottom size={16} /> },
-    { href: '/settings', label: 'Settings',   icon: <Settings size={16} /> },
+    { href: '/dashboard/', label: 'Dashboard', icon: <PanelBottom size={16} /> },
+    { href: '/settings/', label: 'Settings',   icon: <Settings size={16} /> },
   ]
 
   return (
@@ -54,7 +54,7 @@ export function Sidebar() {
       <div className="px-6 py-4">
         <Button
           variant="outline"
-          className="w-full flex items-center justify-center gap-2"
+          className="w-full flex items-center justify-center gap-2 cursor-pointer"
           onClick={() => signOut({ callbackUrl: '/' })}
         >
           <LogOut size={16} /> Logg ut
