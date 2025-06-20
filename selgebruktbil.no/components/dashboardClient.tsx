@@ -336,7 +336,7 @@ export default function DashboardClient() {
                     <div>
                       <p>
                       <span className="font-medium">{c.Navn}</span>
-                      {c["Område (by)"] && <span className="ml-2 text-gray-500"> {c["Område (by)"]}</span>}
+                      {c["Område (by)"] && <span className="ml-2 text-gray-500 bg-[#f0f0f0] text-[10px] p-1 space-x-1 rounded-sm"> {c["Område (by)"]}</span>}
                       </p>
                       <p className="text-xs text-gray-600">{c["E-post"]}</p>
                       <p className="text-xs text-gray-600">{c.Telefon}</p>
