@@ -99,7 +99,7 @@ export default function SettingsPage() {
         {/* E-mail Section */}
         <div>
           <Label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-            E-post **(for kopi av utsendte tilbud)
+            E-post *for kopi av utsendte tilbud
           </Label>
           <Input
             id="email"

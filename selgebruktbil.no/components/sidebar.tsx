@@ -13,7 +13,7 @@ export function Sidebar() {
 
   const items = [
     { href: '/dashboard/', label: 'Dashboard', icon: <PanelBottom size={16} /> },
-    { href: '/settings/', label: 'Settings',   icon: <Settings size={16} /> },
+    { href: '/settings/', label: 'Instillinger',   icon: <Settings size={16} /> },
   ]
 
   return (
