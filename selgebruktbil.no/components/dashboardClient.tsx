@@ -378,7 +378,7 @@ export default function DashboardClient() {
                         variant="outline"
                         size="sm"
                         onClick={() => openOfferDialog(entry)}
-                        className="bg-blue-400 cursor-pointer hover:bg-blue-500"
+                        className="bg-green-500 cursor-pointer hover:bg-green-600 text-white hover:text-white"
                       >
                         Send tilbud
                       </Button>

@@ -39,7 +39,7 @@ export function Sidebar() {
               href={href}
               className={`flex items-center gap-2 p-2 rounded transition
                 ${isActive
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-gray-100 text-black'
                   : 'text-gray-700 hover:bg-gray-100'}
               `}
             >
