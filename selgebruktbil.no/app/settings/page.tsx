@@ -99,7 +99,7 @@ export default function SettingsPage() {
         {/* E-mail Section */}
         <div>
           <Label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-            E-mail
+            E-post **(for kopi av utsendte tilbud)
           </Label>
           <Input
             id="email"
@@ -114,7 +114,7 @@ export default function SettingsPage() {
         {/* Email Template Section */}
         <div>
           <Label htmlFor="template" className="block text-sm font-medium text-gray-700 mb-2">
-            E-mail mal
+            E-postmal for tilbud
           </Label>
           <Textarea
             id="template"

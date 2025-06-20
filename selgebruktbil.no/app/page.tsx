@@ -24,7 +24,7 @@ export default async function Home() {
         height={250}
         className="mb-6 bg-black"
       />
-      <h1 className="text-4xl font-bold mb-4">Selge brukt-bil Dashboard</h1>
+      <h1 className="text-4xl font-bold mb-4">Selge-bruktbil Dashboard</h1>
       <p className="mb-6 text-gray-600">Logg inn for å administrere henvendelser</p>
       <Button asChild>
         <Link href="/api/auth/signin?callbackUrl=/dashboard">Logg inn</Link>
