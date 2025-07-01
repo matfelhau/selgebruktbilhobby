@@ -473,8 +473,10 @@ export default function DashboardClient() {
                         {(c.vehicle_make || c.Merke || c.merke)?.toUpperCase()} {(c.vehicle_model || c.Model || c.model)?.toUpperCase()}
                       </p>
                       <p className="text-xs text-gray-600">{c.Registreringsnummer || c.regnr}</p>
-                      <div className="text-xs text-gray-500 space-y-0.5">
-                        <div>{c.vehicle_color || c.Farge || 'Ukjent farge'} • {c.vehicle_fuel || c.Drivstoff || 'Ukjent drivstoff'} {formatKilometers(c.vehicle_mileage || c.Kilometerstand)} km</div>
+                      <div className="text-xs text-gray-500 space-y-0.5 flex gap-2">
+                        <div className="bg-[#E2E2B9] rounded-sm text-[10px] pl-[5px] pr-[5px] p-[2px]">{c.vehicle_color || c.Farge || 'Ukjent farge'}</div> 
+                        <div className="bg-[#E2E2B9] rounded-sm text-[10px] pl-[5px] pr-[5px] p-[2px]">{c.vehicle_fuel || c.Drivstoff || 'Ukjent drivstoff'}</div> 
+                        <div className="bg-[#E2E2B9] rounded-sm text-[10px] pl-[5px] pr-[5px] p-[2px]">{formatKilometers(c.vehicle_mileage || c.Kilometerstand)} km</div>
                       </div>
                     </div>
                   </TableCell>
@@ -560,7 +562,7 @@ export default function DashboardClient() {
                         variant="outline"
                         size="sm"
                         onClick={() => openOfferDialog(entry)}
-                        className="text-xs"
+                        className="text-xs cursor-pointer"
                       >
                         Send nytt tilbud
                       </Button>
