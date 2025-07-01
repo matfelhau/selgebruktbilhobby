@@ -36,7 +36,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { ChevronLeft, ChevronRight, Search, MoreHorizontal, Car } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search, MoreHorizontal, Clock, CheckCircle, XCircle } from "lucide-react";
 import { format } from "date-fns";
 import type { DateRange } from "react-day-picker";
 
@@ -45,6 +45,7 @@ type Entry = {
   status: number | string;
   content: Record<string, string>;
   updated_at: string;
+  offer_price?: number; // Legg til offer_price
   vehicle?: {
     make: string;
     model: string;
@@ -67,6 +68,17 @@ const formatKilometers = (km: string | number | undefined): string => {
   if (isNaN(number)) return "";
   
   return number.toLocaleString("no-NO").replace(/,/g, " ");
+};
+
+// Helper function to format price
+const formatPrice = (price: number | undefined): string => {
+  if (!price) return "";
+  return new Intl.NumberFormat('nb-NO', {
+    style: 'currency',
+    currency: 'NOK',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(price);
 };
 
 export default function DashboardClient() {
@@ -145,16 +157,16 @@ export default function DashboardClient() {
 
   // Status badges
   const statusLabels: Record<number, React.ReactNode> = {
-    1: <Badge variant="outline">Ikke håndtert</Badge>,
-    2: <Badge variant="outline" className="bg-green-200">Tilbud sendt</Badge>,
-    3: <Badge variant="outline">Fullført</Badge>,
-    4: <Badge variant="outline">Akseptert</Badge>,
-    5: <Badge variant="outline">Ikke interessert</Badge>,
+    1: <Badge variant="outline" className="bg-gray-100">Ikke håndtert</Badge>,
+    2: <Badge variant="outline" className="bg-yellow-100 text-yellow-800"><Clock size={14} className="mr-1" />Tilbud sendt</Badge>,
+    3: <Badge variant="outline" className="bg-green-100 text-green-800"><CheckCircle size={14} className="mr-1" />Fullført</Badge>,
+    4: <Badge variant="outline" className="bg-blue-100 text-blue-800"><CheckCircle size={14} className="mr-1" />Akseptert</Badge>,
+    5: <Badge variant="outline" className="bg-red-100 text-red-800"><XCircle size={14} className="mr-1" />Ikke interessert</Badge>,
   };
 
   // Filters
   const filtered = entries
-    .filter((e) => (statusFilter ? String(e.status) === statusFilter : true))
+    .filter((e) => (statusFilter && statusFilter !== "alle" ? String(e.status) === statusFilter : true))
     .filter((e) =>
       search ? JSON.stringify(e.content).toLowerCase().includes(search.toLowerCase()) : true
     )
@@ -192,13 +204,17 @@ export default function DashboardClient() {
           },
           body: JSON.stringify({ 
             price: parseInt(offerPrice, 10), 
-            email: selectedEntry.content["E-post"] 
+            email: selectedEntry.content["E-post"] || selectedEntry.content["contact-email"]
           }),
         }
       );
       if (res.ok) {
         setEntries((prev) =>
-          prev.map((e) => (e.id === selectedEntry.id ? { ...e, status: 2 } : e))
+          prev.map((e) => (e.id === selectedEntry.id ? { 
+            ...e, 
+            status: 2,
+            offer_price: parseInt(offerPrice, 10) 
+          } : e))
         );
       } else {
         console.error("Send offer failed", await res.text());
@@ -248,7 +264,131 @@ export default function DashboardClient() {
   };
 
   if (loading) {
-    return <div className="p-6">Laster...</div>;
+    return (
+      <div className="p-6">
+        <div className="space-y-6">
+          {/* Header skeleton */}
+          <div className="flex items-center justify-between">
+            <div className="h-8 w-48 bg-gray-200 rounded-lg animate-pulse"></div>
+          </div>
+          
+          {/* Filter bar skeleton */}
+          <div className="flex flex-wrap items-center gap-4 mb-6">
+            <div className="h-9 w-32 bg-gray-200 rounded-md animate-pulse"></div>
+            <div className="h-9 w-40 bg-gray-200 rounded-md animate-pulse"></div>
+            <div className="h-9 w-64 bg-gray-200 rounded-md animate-pulse"></div>
+            <div className="h-9 w-32 bg-gray-200 rounded-md animate-pulse"></div>
+          </div>
+          
+          {/* Table skeleton */}
+          <div className="overflow-auto rounded-lg border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>
+                    <div className="h-4 w-8 bg-gray-300 rounded animate-pulse"></div>
+                  </TableHead>
+                  <TableHead>
+                    <div className="h-4 w-20 bg-gray-300 rounded animate-pulse"></div>
+                  </TableHead>
+                  <TableHead>
+                    <div className="h-4 w-16 bg-gray-300 rounded animate-pulse"></div>
+                  </TableHead>
+                  <TableHead>
+                    <div className="h-4 w-12 bg-gray-300 rounded animate-pulse"></div>
+                  </TableHead>
+                  <TableHead>
+                    <div className="h-4 w-20 bg-gray-300 rounded animate-pulse"></div>
+                  </TableHead>
+                  <TableHead>
+                    <div className="h-4 w-16 bg-gray-300 rounded animate-pulse"></div>
+                  </TableHead>
+                  <TableHead>
+                    <div className="h-4 w-12 bg-gray-300 rounded animate-pulse"></div>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {Array.from({length: 5}).map((_, i) => (
+                  <TableRow key={i} className="hover:bg-gray-50">
+                    {/* Bil kolonne */}
+                    <TableCell className="min-w-[200px]">
+                      <div className="space-y-1">
+                        <div className="h-4 w-40 bg-gray-200 rounded animate-pulse"></div>
+                        <div className="h-3 w-24 bg-gray-200 rounded animate-pulse"></div>
+                        <div className="h-3 w-32 bg-gray-200 rounded animate-pulse"></div>
+                        <div className="h-3 w-20 bg-gray-200 rounded animate-pulse"></div>
+                      </div>
+                    </TableCell>
+                    
+                    {/* Kontaktinfo kolonne */}
+                    <TableCell className="min-w-[150px]">
+                      <div className="space-y-1">
+                        <div className="h-4 w-32 bg-gray-200 rounded animate-pulse"></div>
+                        <div className="h-3 w-36 bg-gray-200 rounded animate-pulse"></div>
+                        <div className="h-3 w-24 bg-gray-200 rounded animate-pulse"></div>
+                      </div>
+                    </TableCell>
+                    
+                    {/* Melding kolonne */}
+                    <TableCell className="max-w-[300px]">
+                      <div className="space-y-1">
+                        <div className="h-3 w-full bg-gray-200 rounded animate-pulse"></div>
+                        <div className="h-3 w-3/4 bg-gray-200 rounded animate-pulse"></div>
+                      </div>
+                    </TableCell>
+                    
+                    {/* Status kolonne */}
+                    <TableCell className="whitespace-nowrap">
+                      <div className="space-y-1">
+                        <div className="h-6 w-24 bg-gray-200 rounded-full animate-pulse"></div>
+                        <div className="h-3 w-20 bg-gray-200 rounded animate-pulse"></div>
+                      </div>
+                    </TableCell>
+                    
+                    {/* Sist oppdatert kolonne */}
+                    <TableCell className="whitespace-nowrap">
+                      <div className="h-4 w-20 bg-gray-200 rounded animate-pulse"></div>
+                    </TableCell>
+                    
+                    {/* Handling kolonne */}
+                    <TableCell className="whitespace-nowrap">
+                      <div className="h-8 w-20 bg-gray-200 rounded animate-pulse"></div>
+                    </TableCell>
+                    
+                    {/* Meny kolonne */}
+                    <TableCell className="whitespace-nowrap">
+                      <div className="h-8 w-8 bg-gray-200 rounded animate-pulse"></div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+          
+          {/* Pagination skeleton */}
+          <div className="flex items-center justify-between">
+            <div className="h-4 w-32 bg-gray-200 rounded animate-pulse"></div>
+            <div className="flex gap-2">
+              <div className="h-8 w-8 bg-gray-200 rounded animate-pulse"></div>
+              <div className="h-8 w-8 bg-gray-200 rounded animate-pulse"></div>
+            </div>
+          </div>
+          
+          {/* Metrics cards skeleton */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {Array.from({length: 5}).map((_, i) => (
+              <div key={i} className="p-4 bg-white rounded-lg shadow border">
+                <div className="space-y-2">
+                  <div className="h-4 w-20 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-8 w-12 bg-gray-200 rounded animate-pulse"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -260,7 +400,7 @@ export default function DashboardClient() {
       <div className="flex flex-wrap items-center gap-4 mb-6">
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="cursor-pointer">
+            <Button variant="outline" size="lg" className="cursor-pointer">
               {dateRange?.from && dateRange.to
                 ? `${format(dateRange.from, "dd.MM.yyyy")} – ${format(dateRange.to, "dd.MM.yyyy")}`
                 : "Velg dato"}
@@ -276,6 +416,7 @@ export default function DashboardClient() {
             <SelectValue placeholder="Alle status" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="alle">Alle status</SelectItem>
             <SelectItem value="1">Ikke håndtert</SelectItem>
             <SelectItem value="2">Tilbud sendt</SelectItem>
             <SelectItem value="3">Fullført</SelectItem>
@@ -288,6 +429,20 @@ export default function DashboardClient() {
           <Input placeholder="Søk..." value={search} onChange={(e) => setSearch(e.target.value)} />
           <Search className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
         </div>
+
+        <Button 
+          variant="outline" 
+          size="lg" 
+          onClick={() => {
+            setStatusFilter("alle");
+            setSearch("");
+            setDateRange(undefined);
+            setPage(1);
+          }}
+          className="text-gray-600 hover:text-gray-800 cursor-pointer"
+        >
+          Nullstill filtre
+        </Button>
       </div>
 
       {/* TABLE */}
@@ -298,10 +453,10 @@ export default function DashboardClient() {
               <TableHead>Bil</TableHead>
               <TableHead>Kontaktinfo</TableHead>
               <TableHead>Melding</TableHead>
-              <TableHead>Sist oppdatert</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Tilbud</TableHead>
+              <TableHead>Sist oppdatert</TableHead>
               <TableHead>Handling</TableHead>
+              <TableHead>Meny</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -310,25 +465,17 @@ export default function DashboardClient() {
               const v = entry.vehicle;
               const s = Number(entry.status);
               
-              
               return (
                 <TableRow key={entry.id} className="hover:bg-gray-50">
                   <TableCell className="min-w-[200px]">
-                    <div className="">
-                      <div>
-                        <p className="font-medium text-sm">
-                          {(v?.make || c.Merke || c.merke)?.toUpperCase()} {(v?.model || c.Model || c.model)?.toUpperCase()}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-gray-600">
-                        <span>{c.Registreringsnummer || c.regnr}</span>
-                        <span>•</span>
-                        <span>{v?.color || 'Grå'}</span>
-                        <span>•</span>
-                        <span>{v?.fuel || 'Diesel'}</span>
-                      </div>
-                      <div className="text-xs text-gray-600">
-                        <span>{formatKilometers(c.Kilometerstand || v?.mileage)} km</span>
+                    <div className="space-y-1">
+                      <p className="font-medium text-sm text-gray-900">
+                        {(c.vehicle_make || c.Merke || c.merke)?.toUpperCase()} {(c.vehicle_model || c.Model || c.model)?.toUpperCase()}
+                      </p>
+                      <p className="text-xs text-gray-600">{c.Registreringsnummer || c.regnr}</p>
+                      <div className="text-xs text-gray-500 space-y-0.5">
+                        <div>{c.vehicle_color || c.Farge || 'Ukjent farge'} • {c.vehicle_fuel || c.Drivstoff || 'Ukjent drivstoff'}</div>
+                        <div>{formatKilometers(c.vehicle_mileage || c.Kilometerstand)} km</div>
                       </div>
                     </div>
                   </TableCell>
@@ -338,31 +485,42 @@ export default function DashboardClient() {
                       <span className="font-medium">{c.Navn}</span>
                       {c["Område (by)"] && <span className="ml-2 text-gray-500 bg-[#f0f0f0] text-[10px] p-1 space-x-1 rounded-sm"> {c["Område (by)"]}</span>}
                       </p>
-                      <p className="text-xs text-gray-600">{c["E-post"]}</p>
+                      <p className="text-xs text-gray-600">{c["E-post"] || c["contact-email"]}</p>
                       <p className="text-xs text-gray-600">{c.Telefon}</p>
                     </div>
                   </TableCell>
                   <TableCell className="max-w-[300px]">
-                    <div className="text-sm">
-                      {c.Melding && (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <p className="text-gray-700 leading-tight max-h-16 overflow-hidden cursor-help">
-                              {c.Melding.length > 150 ? `${c.Melding.substring(0, 150)}...` : c.Melding}
-                            </p>
-                          </TooltipTrigger>
-                          <TooltipContent 
-                            className="max-w-md p-3 text-sm whitespace-pre-wrap"
-                            side="top"
-                            align="start"
-                          >
-                            {c.Melding}
-                          </TooltipContent>
-                        </Tooltip>
-                      )}
-                    </div>
+                    {c.Melding ? (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <p className="text-sm text-gray-700 cursor-help line-clamp-2">
+                            {c.Melding.length > 100 ? `${c.Melding.substring(0, 100)}...` : c.Melding}
+                          </p>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-md p-3 text-sm">
+                          {c.Melding}
+                        </TooltipContent>
+                      </Tooltip>
+                    ) : (
+                      <span className="text-xs text-gray-400">Ingen melding</span>
+                    )}
                   </TableCell>
                   <TableCell className="whitespace-nowrap">
+                    <div className="space-y-1">
+                      {/* Status badge */}
+                      <div>{statusLabels[s]}</div>
+                      
+                      {/* Pristilbud info */}
+                      {entry.offer_price ? (
+                        <div className="">
+                          <p className="font-medium text-green-700 text-xs">Pristilbud: {formatPrice(entry.offer_price)}</p>
+                        </div>
+                      ) : s === 1 ? (
+                        <span className="text-xs text-gray-400">Ingen tilbud sendt</span>
+                      ) : null}
+                    </div>
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap text-sm text-gray-600">
                     {new Date(entry.updated_at).toLocaleDateString("no-NO", {
                       day: "2-digit",
                       month: "2-digit",
@@ -371,9 +529,8 @@ export default function DashboardClient() {
                       minute: "2-digit",
                     })}
                   </TableCell>
-                  <TableCell>{statusLabels[s]}</TableCell>
                   <TableCell className="whitespace-nowrap">
-                    {(s === 1 || s === 5) && (
+                    {s === 1 && (
                       <Button
                         variant="outline"
                         size="sm"
@@ -383,7 +540,13 @@ export default function DashboardClient() {
                         Send tilbud
                       </Button>
                     )}
-                    {s === 2 || s=== 4 && (
+                    {s === 2 && (
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Clock size={16} className="text-yellow-600" />
+                        <span>Venter på svar</span>
+                      </div>
+                    )}
+                    {s === 4 && (
                       <Button
                         variant="outline"
                         size="sm"
@@ -392,6 +555,22 @@ export default function DashboardClient() {
                       >
                         Marker som fullført
                       </Button>
+                    )}
+                    {s === 5 && ( 
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => openOfferDialog(entry)}
+                        className="text-gray-700"
+                      >
+                        Send nytt tilbud
+                      </Button>
+                    )}
+                    {s === 3 && (
+                      <div className="flex items-center gap-2 text-sm text-green-600">
+                        <CheckCircle size={16} />
+                        <span>Fullført</span>
+                      </div>
                     )}
                   </TableCell>
                   <TableCell className="whitespace-nowrap">
@@ -445,16 +624,17 @@ export default function DashboardClient() {
       </div>
 
       {/* METRICS CARDS */}
-      <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="mt-8 grid grid-cols-2 md:grid-cols-5 gap-4">
         {[
           { label: "Total", fn: (e: Entry[]) => e.length },
           { label: "Tilbud sendt", fn: (e: Entry[]) => e.filter((x) => Number(x.status) === 2).length },
-          { label: "Fullført", fn: (e: Entry[]) => e.filter((x) => Number(x.status) === 3).length },
           { label: "Akseptert", fn: (e: Entry[]) => e.filter((x) => Number(x.status) === 4).length },
+          { label: "Fullført", fn: (e: Entry[]) => e.filter((x) => Number(x.status) === 3).length },
+          { label: "Ikke interessert", fn: (e: Entry[]) => e.filter((x) => Number(x.status) === 5).length },
         ].map((m, i) => (
-          <div key={i} className="p-4 bg-white rounded-lg shadow">
-            <p className="text-sm text-gray-500">{m.label}</p>
-            <p className="text-2xl font-semibold">{m.fn(entries)}</p>
+          <div key={i} className="p-4 bg-white rounded-lg shadow border">
+            <p className="text-sm text-gray-500 mb-1">{m.label}</p>
+            <p className="text-2xl font-semibold text-gray-900">{m.fn(entries)}</p>
           </div>
         ))}
       </div>
@@ -474,6 +654,11 @@ export default function DashboardClient() {
               <p className="text-sm text-gray-600">
                 {selectedEntry?.content["Registreringsnummer"] || selectedEntry?.content["regnr"]}
               </p>
+              {selectedEntry?.offer_price && (
+                <div className="mt-2 p-2 bg-blue-50 rounded text-sm">
+                  <p className="text-blue-700">Tidligere tilbud: <strong>{formatPrice(selectedEntry.offer_price)}</strong></p>
+                </div>
+              )}
             </div>
             <Input
               placeholder="Pris i NOK"
@@ -481,6 +666,9 @@ export default function DashboardClient() {
               value={offerPrice}
               onChange={(e) => setOfferPrice(e.target.value)}
             />
+            <div className="p-3 bg-blue-50 rounded-lg text-sm text-blue-700">
+              💡 Kunden vil motta en e-post med tilbudet og kan velge å akseptere eller avslå. Du får automatisk beskjed når de svarer.
+            </div>
           </div>
           <DialogFooter className="space-x-2">
             <Button variant="outline" onClick={() => setOpenDialog(false)}>
