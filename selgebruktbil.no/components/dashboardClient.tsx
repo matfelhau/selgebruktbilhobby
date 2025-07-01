@@ -542,7 +542,7 @@ export default function DashboardClient() {
                     )}
                     {s === 2 && (
                       <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Clock size={16} className="text-yellow-600" />
+                        <Clock size={16} className="text-yellow-600 text-xs" />
                         <span>Venter på svar</span>
                       </div>
                     )}
@@ -551,7 +551,7 @@ export default function DashboardClient() {
                         variant="outline"
                         size="sm"
                         onClick={() => promptFinishOffer(entry)}
-                        className="cursor-pointer"
+                        className="cursor-pointer text-xs"
                       >
                         Marker som fullført
                       </Button>
@@ -561,13 +561,13 @@ export default function DashboardClient() {
                         variant="outline"
                         size="sm"
                         onClick={() => openOfferDialog(entry)}
-                        className="text-gray-700"
+                        className="text-gray-700 text-xs"
                       >
                         Send nytt tilbud
                       </Button>
                     )}
                     {s === 3 && (
-                      <div className="flex items-center gap-2 text-sm text-green-600">
+                      <div className="flex items-center gap-2 text-xs text-green-600">
                         <CheckCircle size={16} />
                         <span>Fullført</span>
                       </div>
