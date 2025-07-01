@@ -3,7 +3,7 @@ import { Sidebar } from '@/components/sidebar'
 import type { ReactNode } from 'react'
 
 export const metadata = {
-  title: 'Dashboard – SendOffer Admin',
+  title: 'Dashboard – EasyDeals Admin',
 }
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
