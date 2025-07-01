@@ -474,8 +474,7 @@ export default function DashboardClient() {
                       </p>
                       <p className="text-xs text-gray-600">{c.Registreringsnummer || c.regnr}</p>
                       <div className="text-xs text-gray-500 space-y-0.5">
-                        <div>{c.vehicle_color || c.Farge || 'Ukjent farge'} • {c.vehicle_fuel || c.Drivstoff || 'Ukjent drivstoff'}</div>
-                        <div>{formatKilometers(c.vehicle_mileage || c.Kilometerstand)} km</div>
+                        <div>{c.vehicle_color || c.Farge || 'Ukjent farge'} • {c.vehicle_fuel || c.Drivstoff || 'Ukjent drivstoff'} {formatKilometers(c.vehicle_mileage || c.Kilometerstand)} km</div>
                       </div>
                     </div>
                   </TableCell>
@@ -561,7 +560,7 @@ export default function DashboardClient() {
                         variant="outline"
                         size="sm"
                         onClick={() => openOfferDialog(entry)}
-                        className="text-gray-700 text-xs"
+                        className="text-xs"
                       >
                         Send nytt tilbud
                       </Button>
