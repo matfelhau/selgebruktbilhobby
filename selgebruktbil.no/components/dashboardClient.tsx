@@ -513,7 +513,7 @@ export default function DashboardClient() {
                       {/* Pristilbud info */}
                       {entry.offer_price ? (
                         <div className="">
-                          <p className="font-medium text-green-700 text-xs">Pristilbud: {formatPrice(entry.offer_price)}</p>
+                          <p className="font-medium text-xs">Pristilbud: {formatPrice(entry.offer_price)}</p>
                         </div>
                       ) : s === 1 ? (
                         <span className="text-xs text-gray-400">Ingen tilbud sendt</span>
